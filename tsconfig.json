@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "types": ["node", "mocha"]
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

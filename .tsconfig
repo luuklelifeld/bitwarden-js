@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./lib",
+    "strict": true,
+    "types": ["mocha", "node"]
+  },
+  "types": ["mocha", "node"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
