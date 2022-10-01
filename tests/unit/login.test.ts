@@ -1,5 +1,4 @@
 import assert = require("assert")
-import { kMaxLength } from "buffer"
 import { Bitwarden } from "../../src"
 
 describe('Login', () => {
@@ -35,6 +34,19 @@ describe('Login', () => {
             }
 
             assert.equal(error?.message, "Bitwarden login failed")
+        })
+
+        it('should fail when using local installation', async () => {
+            const bitwarden = new Bitwarden({useLocalBitwarden: true, sessionToken: "foobar"})
+            let error: Error | undefined
+
+            try {
+                await bitwarden.login(process.env.BW_EMAIL, process.env.BW_PASSWORD, process.env.BW_CLIENT_SECRET)
+            } catch (e) {
+                error = e
+            }
+
+            assert.equal(error?.message, "Unable to login, using local bitwarden installation")
         })
     })
 })
