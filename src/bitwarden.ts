@@ -1,45 +1,39 @@
-import { spawn } from "child_process"
-
+import { spawn, spawnSync } from "child_process"
+import { debuffer } from "./helpers/casting"
 export class Bitwarden {
     sessionToken: string
 
-    async loginEmail(email: string, password: string, clientSecret: string) {
-        const login = spawn('npx', ['bw', 'login', '--raw'], {
-            env: process.env
-        })
-        
-        setTimeout(() => {
-            login.stdin.write(email)
-        }, 1000)
-
-        setTimeout(() => {
-            login.stdin.write(password)
-        }, 2000)
-
-        setTimeout(() => {
-            login.stdin.write(clientSecret)
-        }, 3000)
-
-        login.stdout.on('data', (data) => {
-            this.sessionToken = data
-        })
-
-        await new Promise((resolve) => {
-            login.on('exit', resolve);
-        });
+    logout(): void {
+        spawnSync('npx', ['bw', 'logout'])
+        this.sessionToken = undefined
     }
 
-    async loginAPI(clientId: string, clientSecret: string) {
-        const login = spawn('npx', ['bw', 'login', '--apikey', '--raw'])
+    async login(email: string, password: string, clientSecret: string) {
+        this.logout()
 
-        // await new Promise(resolve => setTimeout(resolve, 1000));
-        // login.send(clientId)
-        // await new Promise(resolve => setTimeout(resolve, 1000));
-        // login.send(clientSecret)
+        const login = spawn('npx', ["bw", "login", "--raw", email, password])
+        let sessionToken: string
+    
+        login.stdout.on('data', (data) => { 
+            sessionToken = debuffer(data)
+        })
+    
+        setTimeout(function() {
+            login.stdin.write(`${clientSecret}\n`);
+        }, 1000);
+    
+        login.stderr.on('data', (data) => {
+            data = debuffer(data)
+        })
+    
+        await new Promise((resolve) => {
+            login.on('close', resolve)
+        })
+    
+        if (sessionToken?.length < 3 || !sessionToken) {
+            throw new Error("Bitwarden login failed")
+        }
 
-        const exitCode = await new Promise((resolve) => {
-            login.on('close', resolve);
-        });
-        
+        this.sessionToken = sessionToken
     }
 }

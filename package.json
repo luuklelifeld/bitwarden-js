@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "mocha 'tests/**/*.ts'",
+    "test": "mocha 'tests/**/*.ts' -r dotenv/config",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
   },
@@ -23,6 +23,7 @@
   "devDependencies": {
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.7.15",
+    "dotenv": "^16.0.3",
     "mocha": "^10.0.0",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
